@@ -13,6 +13,14 @@ def generate_threadid():
     thread_id = uuid.uuid4()
     return thread_id
 
+
+def reset_history():
+    st.session_state['thread_id'] = generate_threadid()
+    st.session_state['message_history'] = []
+    
+    
+    
+
 if 'message_history' not in st.session_state:
     st.session_state['message_history'] = []
 
@@ -31,7 +39,8 @@ config = {'configurable' : {'thread_id' : st.session_state['thread_id']}}
     
 st.sidebar.title('LangGraph Chatbot')
 
-st.sidebar.button('New Chat')
+if st.sidebar.button('New Chat'):
+    reset_history()
 
 st.sidebar.header('My Conversations')
 
