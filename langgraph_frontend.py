@@ -1,7 +1,8 @@
 import streamlit as st
-from langgraph_backend import workflow
+from backend import workflow , retrieve_all_threads
 from langchain_core.messages import HumanMessage
 import uuid
+
 
 
 user_input = st.chat_input("Type Here")
@@ -37,7 +38,9 @@ if  'thread_id' not in st.session_state:
 
 
 if 'chat_threads' not in st.session_state:
-    st.session_state['chat_threads'] = []
+    st.session_state['chat_threads'] =  retrieve_all_threads()
+    
+    
     
 
 add_thread(st.session_state['thread_id'])
@@ -58,6 +61,8 @@ if st.sidebar.button('New Chat'):
 st.sidebar.header('My Conversations')
 
 for thread_id in st.session_state['chat_threads']:
+    
+    
     if st.sidebar.button(str(thread_id)):
         st.session_state['thread_id'] = thread_id
         messages = load_conversation(thread_id)
@@ -89,6 +94,7 @@ if user_input:
     
     st.session_state['message_history'].append({'role' : 'user' , 'content' : user_input})
     with st.chat_message("user"):
+         
         st.markdown(user_input)
     
 
@@ -104,4 +110,3 @@ if user_input:
         )
         
     st.session_state['message_history'].append({'role' : 'assistant' , 'content' : ai_message})
-     
