@@ -48,7 +48,15 @@ add_thread(st.session_state['thread_id'])
 
 
 
-config = {'configurable' : {'thread_id' : st.session_state['thread_id']}}
+config = {
+    'configurable' : {'thread_id' : st.session_state['thread_id']},
+    'meta_data' : {
+        "thread_id" : st.session_state['thread_id']
+    },
+    
+    "run_name" : "chatTurn"
+    
+    }
 
 
     
