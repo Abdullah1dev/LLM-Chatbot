@@ -63,6 +63,12 @@ config = {
     
 st.sidebar.title('LangGraph Chatbot')
 
+uploaded_file  = st.sidebar.file_uploader(
+    "Upload a PDF",
+    type = ['pdf']
+    
+)
+
 if st.sidebar.button('New Chat'):
     reset_history()
 

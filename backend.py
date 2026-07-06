@@ -7,6 +7,14 @@ import os
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph.message import add_messages
 import sqlite3
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_chroma import chorma
+from langchain_community.vectorstores import FAISS
+
+
+
 
 
 
@@ -18,6 +26,13 @@ model = ChatOpenAI(
     base_url =os.getenv("OPENAI_BASE_URL")
      
 )
+
+def initialize_rag(uploaded_file):
+    pass
+
+    
+    
+    
 
 
 
