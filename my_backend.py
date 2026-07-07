@@ -17,12 +17,6 @@ from langgraph.prebuilt import tools_condition
 
 
 
-
-
-
-
-
-
 load_dotenv()
 
 model = ChatOpenAI(
@@ -88,6 +82,8 @@ def initialize_rag(uploaded_file):
 
 @tool
 def rag_tool(query : str) -> str:
+    print("RAG tool is executed")
+    
     """
     Use the uploaded pdf and return relevant information to answer the user question
     Use this tool ONLY when the user is asking questions about the uploaded PDF or document.
