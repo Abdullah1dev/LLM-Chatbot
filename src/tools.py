@@ -2,6 +2,8 @@ from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode
 from langgraph.prebuilt import tools_condition
 from src.rag import retriever , set_retriever
+from langgraph.types import interrupt
+
 
 
 @tool
@@ -27,7 +29,33 @@ def rag_tool(query : str) -> str:
     return context
     
     
+
+@tool
+def  delete_conversation() -> str:
+    
+    
+    """
+    Delete a conversation using its thread ID.
+    This tool should only be used when the user explicitly requests to delete a conversation.
+    """
+    
+    approval = interrupt(
+        "Do you reallly want to Delete this conversation??"
+        
+    )
+    
+    print("Approval recieved" , approval)
+    
+    
+    
+    
+    return "Delete tool executed"
+
+
+
+    
     
 
-tools = [rag_tool]
+tools = [rag_tool , delete_conversation]
+
 

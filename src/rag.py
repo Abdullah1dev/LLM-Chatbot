@@ -4,7 +4,7 @@ import os
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-retriever = None
+
 
 
 
@@ -14,7 +14,7 @@ retriever = None
 embeddings = HuggingFaceEmbeddings(
     model_name="BAAI/bge-small-en-v1.5"
 )
-
+retriever = None
 
 def set_retriever(new_retriever):
     global retriever
