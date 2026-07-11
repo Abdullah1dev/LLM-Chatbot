@@ -1,12 +1,10 @@
 from langgraph.graph import StateGraph , START , END
-from typing import TypedDict , Annotated
-from langchain_core.messages import BaseMessage , HumanMessage
-from langchain_openai import ChatOpenAI
-from dotenv import load_dotenv
+
+
 import os
-from langgraph.checkpoint.sqlite import SqliteSaver
-from langgraph.graph.message import add_messages
-import sqlite3
+
+from langchain_core.messages import HumanMessage
+
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
@@ -14,17 +12,10 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.tools import tool
 from langgraph.prebuilt import ToolNode
 from langgraph.prebuilt import tools_condition
+from src.llm import model
+from src.memory import checkpointer , retrieve_all_threads
+from src.state import ChatState
 
-
-
-load_dotenv()
-
-model = ChatOpenAI(
-    model = "openrouter/free",
-    api_key =os.getenv("OPEN_AI_API_KEY"),
-    base_url =os.getenv("OPENAI_BASE_URL")
-     
-)
 
 
 embeddings = HuggingFaceEmbeddings(
@@ -82,13 +73,16 @@ def initialize_rag(uploaded_file):
 
 @tool
 def rag_tool(query : str) -> str:
-    print("RAG tool is executed")
+    
     
     """
     Use the uploaded pdf and return relevant information to answer the user question
     Use this tool ONLY when the user is asking questions about the uploaded PDF or document.
-    
     """
+    
+    print("RAG tool is executed")
+    
+    
     if retriever  is None:
         return "No document is currently available for retrievel"
     
@@ -110,12 +104,8 @@ tool_node = ToolNode(tools)
 
 
 
-    
-    
 
 
-class ChatState(TypedDict):
-    messages : Annotated[list[BaseMessage] , add_messages]
     
     
 
@@ -127,9 +117,7 @@ def chatnode(state : ChatState):
     return {'messages' : [response]}
 
 
-conn = sqlite3.connect('chatbot.db' , check_same_thread=False)
 
-checkpointer = SqliteSaver(conn = conn)
 
 
 graph = StateGraph(ChatState)
@@ -145,13 +133,3 @@ workflow = graph.compile(checkpointer = checkpointer)
 
 
 
-def retrieve_all_threads():
-    print("Function Defined")
-    
-    all_threads = set()
-    
-    
-    for checkpoint in checkpointer.list(None):
-        all_threads.add(checkpoint.config['configurable']['thread_id'])
-    
-    return list(all_threads)
