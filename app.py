@@ -63,6 +63,9 @@ if "waiting_for_approval" not in st.session_state:
 if "approval_config" not in st.session_state:
     st.session_state.approval_config = None
     
+
+if "interrupt_messages" not in st.session_state:
+    st.session_state.interrupt_messages = None
     
 
 add_thread(st.session_state['thread_id'])
@@ -79,12 +82,6 @@ config = {
     "run_name" : "chatTurn"
     
     }
-
-if st.button("Resume"):
-    workflow.invoke(
-        Command(resume = True),
-        config = config
-    )
 
 
 
@@ -166,8 +163,39 @@ def is_action_required(user_input : str) -> bool:
     
     return any(keyword in user_input for keyword in action_keywords)
 
-        
-        
+
+if st.session_state.waiting_for_approval:
+    st.warning(st.session_state.interrupt_messages)
+    
+    col1 , col2 = st.columns(2)
+    
+    with col1:
+        if st.button("Yes"):
+            result = workflow.invoke(
+                Command(resume = True),
+                config = st.session_state.approval_config 
+                
+            )
+            
+            st.session_state.waiting_for_approval = False
+            st.session_state.approval_config = None
+            st.session_state.interrupt_messages = None
+            
+            st.rerun()
+    
+    with col2:
+        if st.button("No"):
+            result = workflow.invoke(
+                Command(resume = False),
+                config = st.session_state.approval_config
+                
+            )
+            st.session_state.waiting_for_approval = False
+            st.session_state.approval_config = None
+            st.session_state.interrupt_messages = None
+            
+            st.rerun()
+            
 
 
 if user_input:
@@ -179,12 +207,19 @@ if user_input:
     
 
     if is_action_required(user_input):
-        response = workflow.invoke(
+        result = workflow.invoke(
             {"messages" : [HumanMessage(content=user_input)]},
             config=config
             
             
         )
+        if "__interrupt__" in result:
+            st.session_state.waiting_for_approval = True
+            st.session_state.approval_config = config
+            st.session_state.interrupt_messages = result["__interrupt__"][0].value
+            
+            st.rerun()
+        
     else:
         with st.chat_message('assistant'):
             ai_message = st.write_stream(
